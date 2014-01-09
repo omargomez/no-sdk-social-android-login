@@ -1,0 +1,13 @@
+.idea
+atlassian-ide-plugin.xml
+*.iml
+classes
+gen-external-apklibs
+gen
+.DS_Store
+target
+bin
+project.properties
+.settings
+.classpath
+.project
