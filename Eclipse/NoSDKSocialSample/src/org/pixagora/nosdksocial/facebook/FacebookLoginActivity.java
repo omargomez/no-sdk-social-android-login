@@ -1,13 +1,20 @@
 package org.pixagora.nosdksocial.facebook;
 
+import java.io.Serializable;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.pixagora.nosdksocialdemo.R;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -84,13 +91,17 @@ public class FacebookLoginActivity extends Activity {
 						
 						@Override
 						public void run() {
-							final Map<String, String> meData = getEmail( access_token );
+							final String meData = getMeData( access_token );
 							
 							activity.runOnUiThread(new Runnable() {
 								
 								@Override
 								public void run() {
-									//TODO: app.onLoginReady( (SherlockFragmentActivity) activity, OAUTH_ENDPOINT, JSONValue.toJSONString(meData), false);
+									//TODO: Retornar un status
+									Intent returnIntent = new Intent();
+									returnIntent.putExtra("me_data", meData );
+									activity.setResult(200, returnIntent);
+									activity.finish();
 								}
 							});
 						}
@@ -112,7 +123,7 @@ public class FacebookLoginActivity extends Activity {
 			}
 		}
 
-		private Map<String, String> getEmail(String access_token) {
+		private String getMeData(String access_token) {
 			
 			try {
 				RestClient client = new RestClient(
@@ -124,8 +135,7 @@ public class FacebookLoginActivity extends Activity {
 				client.execute(RequestMethod.GET);
 				if (client.getResponseCode() == 200) {
 					 //TODO: Map<String, String> result = (Map<String,String>)JSONValue.parse(client.getResponse());
-					 return null;
-					 
+					return client.getResponse();
 				} else {
 					//online failed
 					throw  new RuntimeException("Error en tales 2"); // TODO
@@ -141,11 +151,13 @@ public class FacebookLoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		//TODO: assert parameters
+		String clientId = getIntent().getExtras().getString("client_id");
 		setContentView(R.layout.nosdka_facebook_layout);
 		progressIndicator = (ProgressBar) findViewById(R.id.facebook_load_progress);
 		webView = (WebView) findViewById(R.id.webview);
 		Bundle parameters = new Bundle();
-		parameters.putString("client_id", "358781964212408");
+		parameters.putString("client_id", clientId);
 		parameters.putString("response_type", "token");
 		parameters.putString("scope", "email");
 		parameters.putString("redirect_uri", REDIRECT_URI );

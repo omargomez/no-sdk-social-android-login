@@ -1,5 +1,6 @@
 package org.pixagora.nosdksocialdemo;
 
+import org.json.JSONObject;
 import org.pixagora.nosdksocial.facebook.FacebookLoginActivity;
 
 import android.app.Activity;
@@ -22,12 +23,12 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 			
 			// Open facebook dialog
+			//TODO: Utility class to encapsulate this
 			Log.d(TAG, "onClick");
 			Intent intent = new Intent();
 			intent.setClass( MainActivity.this, FacebookLoginActivity.class);
-			//intent.putExtra("major", targetMajor);
-			//intent.putExtra("minor", targetMinor);
-			startActivityForResult(intent, 200);
+			intent.putExtra("client_id", "358781964212408");
+			startActivityForResult(intent, FacebookLoginActivity.class.getName().hashCode());
 			
 		}
 	};
@@ -50,7 +51,16 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.i(TAG, "onActivityResult: " + requestCode);
 		super.onActivityResult(requestCode, resultCode, data);
-		Log.i(TAG, "onActivityResult");
+		
+		//TODO: Utility class to encapsulate this
+		if (data != null) {
+			Bundle extras = data.getExtras();
+			String meData =  extras.getString("me_data");
+			Log.d(TAG, meData );
+		} else {
+			Log.d(TAG, "Canceled activity");
+		}
 	}
 }
